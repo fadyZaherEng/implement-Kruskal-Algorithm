@@ -1,0 +1,86 @@
+#include <iostream>
+#include <map>
+#include <vector>
+#include <queue>
+#include  <string>
+
+using namespace std;
+
+map <string, string> parent;
+map <string, vector<pair<string, double> > > graph; /// CityA -> CityB with Distance C
+priority_queue <pair<double, pair<string, string> > > kruskalQ;
+
+string findParent(string city)
+{
+هنا بشوف لو هيه مرتبطة بنفسها برجعها
+    if(parent[city] == city)
+        return city;
+هنا لو لا يعمل recursion عليها ويرجع ابوها
+    return parent[city] = findParent(parent[city]);
+}
+
+void join(string a, string b)
+{
+    a = findParent(a);
+    b = findParent(b);
+    if (a == b)
+        return;
+هنا لو ملقتش نفس الأب بتربطهم
+    parent[b] = a;
+}
+
+int main()
+{
+    while(1)
+    {
+        string a,b;
+        double c;
+
+        cout << "Insert City A, City B and the distance between them (-1 to quit): ";
+        cin >> a;
+        if(a == "-1")
+            break;
+        cin >> b >> c;
+هنا بربط كل وحده بنفسها
+        parent[a] = a;
+        parent[b] = b;
+
+        kruskalQ.push({-1*c, {a, b}});
+    }
+
+    while(!kruskalQ.empty())
+    {
+        string cityA = kruskalQ.top().second.first;
+        string cityB = kruskalQ.top().second.second;
+        double dist = -1*kruskalQ.top().first;
+        kruskalQ.pop();
+لو رجعوا ننفس الأب بكمل عادي
+        if(findParent(cityA) == findParent(cityB))
+            continue;
+
+        graph[cityA].push_back({cityB,dist});
+        graph[cityB].push_back({cityA,dist});
+        cout << cityA << ' ' << cityB << ' ' << dist << endl;
+
+        join(cityA, cityB);
+    }
+
+
+return 0;
+}
+
+
+/*
+Test Case:
+a b 2
+a c 3
+a d 3
+c d 5
+c b 5
+d f 7
+c e 1
+c b 4
+b e 3
+f g 9
+-1
+*/
